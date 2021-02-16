@@ -96,12 +96,10 @@ describe('Terrain', () => {
       [0, 2, 0],
       [3, 0, 1]
     ])
-    expect(terrain.get(0, 1, 3, 'N')).toBe(1)
-    expect(terrain.get(0, 1, 3, 'E')).toBe(2)
-    expect(terrain.get(0, 1, 3, 'S')).toBe(3)
-    expect(terrain.get(0, 1, 3, 'W')).toBeUndefined()
-
-   
+    expect(terrain.get(1, 0, 3, 'N')).toBe(1)
+    expect(terrain.get(1, 0, 3, 'E')).toBe(2)
+    expect(terrain.get(1, 0, 3, 'S')).toBe(3)
+    expect(terrain.get(1, 0, 3, 'W')).toBeUndefined()  
   })
 
  
