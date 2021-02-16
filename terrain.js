@@ -10,11 +10,16 @@ class Terrain {
     }
   }
 
-  init(grid){
-    if (grid.length < 3){
-      throw new Error('Grid too small')
+  init(gridOrSize){
+    if (typeof gridOrSize === 'object') {
+      this.grid = gridOrSize
+      return
     }
-    this.grid = grid
+    const gridSize = gridOrSize
+    if (!(Math.log2(gridSize - 1) % 1 === 0)){
+      throw new Error('Grid size not valid')
+    }
+    this.grid = new Array(gridSize).fill(0).map(() => new Array(gridSize).fill(0))
   }
 
   runSquare(x, y, size){
@@ -39,6 +44,17 @@ class Terrain {
     const cornerX = this.directionLookup[direction][0] * jump + x
     const cornerY = this.directionLookup[direction][1] * jump + y
     return this.grid[cornerX][cornerY]
+  }
+
+  run(size){
+    const middle = Math.floor(size / 2)
+    if (middle < 1) return
+    for (let x = middle; x < this.grid.length; x += size){
+      for (let y = middle; y < this.grid.length; y += size){
+        this.runSquare(x, y, size)
+      }
+    }
+    this.run(middle)
   }
 
 
