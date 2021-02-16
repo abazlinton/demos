@@ -35,6 +35,16 @@ class Terrain {
     this.set(x, y, this.average(corners))
   }
 
+  runDiamond(x, y, size){
+    const points = []
+    points.push(this.get(x, y, size, 'N'))
+    points.push(this.get(x, y, size, 'E'))
+    points.push(this.get(x, y, size, 'S'))
+    points.push(this.get(x, y, size, 'W'))
+    const onGridPoints = points.filter(point => point !== undefined)
+    this.set(x, y, this.average(onGridPoints))
+  }
+
   set(x, y, value){
     this.grid[x][y] = value
   }
@@ -47,7 +57,7 @@ class Terrain {
     const jump = Math.floor(sideLength / 2)
     const cornerX = this.directionLookup[direction][0] * jump + x
     const cornerY = this.directionLookup[direction][1] * jump + y
-    return this.grid[cornerX][cornerY]
+    return this.grid[cornerX]?.[cornerY]
   }
 
   run(size){

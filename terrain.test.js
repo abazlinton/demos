@@ -7,7 +7,7 @@ describe('Terrain', () => {
     expect(() => new Terrain().init(7)).toThrow('Grid size not valid')
   });
 
-  it('should be able to calculate corner values 3x3', () => {
+  it('should be able to retrieve corner values 3x3', () => {
     const terrain = new Terrain()
     terrain.init([
       [1, 0, 2],
@@ -20,7 +20,7 @@ describe('Terrain', () => {
     expect(terrain.get(1, 1, 3, 'SW')).toBe(4)
   })
 
-  it('should be able to calculate corner values 5x5', () => {
+  it('should be able to retrieve corner values 5x5', () => {
     const terrain = new Terrain()
     terrain.init([
       [1, 0, 0, 0, 2],
@@ -36,7 +36,7 @@ describe('Terrain', () => {
     expect(terrain.get(2, 2, 5, 'SW')).toBe(4)
   })
 
-  it('should be able to calculate corner values of 3x3 within a 5x5', () => {
+  it('should be able to retrieve corner values of 3x3 within a 5x5', () => {
     const terrain = new Terrain()
     terrain.init([
       [1, 0, 2, 0, 0],
@@ -86,10 +86,9 @@ describe('Terrain', () => {
     expect(terrain.grid[1][3]).toBe(2)
     expect(terrain.grid[3][3]).toBe(2)
     expect(terrain.grid[3][1]).toBe(2)
-    console.log(terrain.grid)
   });
 
-  it('should be able to calculate diamond values 3x3', () => {
+  it('should be able to retrieve diamond values 3x3', () => {
     const terrain = new Terrain()
     terrain.init([
       [1, 0, 1],
@@ -102,6 +101,38 @@ describe('Terrain', () => {
     expect(terrain.get(1, 0, 3, 'W')).toBeUndefined()  
   })
 
+  it('should not blow up reading off-grid', () => {
+    const terrain = new Terrain()
+    terrain.init([
+      [1]
+    ])
+    expect(terrain.get(0, 0, 3, 'N')).toBeUndefined()
+    expect(terrain.get(0, 0, 3, 'S')).toBeUndefined()
+    expect(terrain.get(0, 0, 3, 'W')).toBeUndefined()
+    expect(terrain.get(0, 0, 3, 'E')).toBeUndefined()
+  })
+
+  it('should set diamond value 3 points', () => {
+    const terrain = new Terrain()
+    terrain.init([
+      [1, 0, 0],
+      [0, 2, 0],
+      [3, 0, 0]
+    ])
+    terrain.runDiamond(1, 0, 3)
+    expect(terrain.grid[1][0]).toBe(2)
+  });
+
+  it('should set diamond value 4 points', () => {
+    const terrain = new Terrain()
+    terrain.init([
+      [0, 2, 0],
+      [8, 0, 4],
+      [0, 6, 0]
+    ])
+    terrain.runDiamond(1, 1, 3)
+    expect(terrain.grid[1][1]).toBe(5)
+  });
  
 
 
