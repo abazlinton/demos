@@ -12,18 +12,19 @@
 <body>
   <canvas id="canvas" width="1000" height="1000"></canvas>
   <script>
+    
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const terrain = new Terrain()
-    const power = 5
+    const power = 8
     const size = 2 ** power
     terrain.init(size + 1)
     terrain.set(0, 0, 10)
-    terrain.set(0, size, 10)
+    terrain.set(0, size, 30)
     terrain.set(size, size, 60)
-    terrain.set(size, 0, 60)
+    terrain.set(size, 0, 100)
     terrain.run(size + 1)
-    const squareSize = 20
+    const squareSize = 3
     const max = Math.max(...terrain.grid.flat())
     terrain.grid.forEach((col, y) => col.forEach((cell, x) => {
       const gradient = cell / max * 256
