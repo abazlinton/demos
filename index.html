@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="terrain.js"></script>
+</head>
+
+<body>
+  <canvas id="canvas" width="1000" height="1000"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const terrain = new Terrain()
+    const power = 5
+    const size = 2 ** power
+    terrain.init(size + 1)
+    terrain.set(0, 0, 10)
+    terrain.set(0, size, 10)
+    terrain.set(size, size, 60)
+    terrain.set(size, 0, 60)
+    terrain.run(size + 1)
+    const squareSize = 20
+    const max = Math.max(...terrain.grid.flat())
+    terrain.grid.forEach((col, y) => col.forEach((cell, x) => {
+      const gradient = cell / max * 256
+      ctx.fillStyle = `rgb(${gradient}, ${gradient}, ${gradient})`
+      ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize)
+    }))
+  </script>
+
+</body>
+
+</html>

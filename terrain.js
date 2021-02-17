@@ -66,12 +66,15 @@ class Terrain {
     for (let x = middle; x < this.grid.length; x += size){
       for (let y = middle; y < this.grid.length; y += size){
         this.runSquare(x, y, size)
+        this.runDiamond(x, y - middle, size) // top
+        this.runDiamond(x + middle, y, size) // right
+        this.runDiamond(x, y + middle, size) // bottom
+        this.runDiamond(x - middle, y, size) // left
       }
     }
     this.run(middle)
   }
-
-
 }
+
 
 module.exports = Terrain
