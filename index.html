@@ -5,21 +5,32 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="twitter:card" content="card" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@abazlinton" />
-  <meta name="twitter:title" content="Terrain Generator" />
-  <meta name="twitter:description" content="Generate realistic looking terrain" />
-  <meta name="twitter:image" content="https://demos-iota.vercel.app/preview.png" />
-  <title>Terrain Generator</title>
+  <meta name="twitter:title" content="Sunset Generator" />
+  <meta name="twitter:description" content="Generate 'realistic' looking sunsets" />
+  <meta name="twitter:image" content="https://sunset-delta.vercel.app/sunset.png" />
+  <title>Sunset Generator</title>
   <script src="terrain.js"></script>
+  <script>
+    function reload(){
+      document.querySelector('body').innerHTML = ''
+      location.reload()
+    }  
+  </script>
 </head>
 
 <body>
-  <h1 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;">Click terrain to regenerate</h1>
-  <canvas onclick="redraw()" id="canvas" width="1200" height="1200" ></canvas>
- 
+  <h1
+    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;" onclick="reload()">
+    Please Wait...</h1>
+  <!-- <canvas onclick="redraw()" id="canvas" width="1200" height="1200"></canvas> -->
+
 </body>
-<script>
+<script type="module">
+
+  
+  import * as THREE from 'https://unpkg.com/three/build/three.module.js';
 
   const terrainPallette = [
     '#FFFFFF',
@@ -28,50 +39,112 @@
     '#734C23',
     '#5F3E31',
     '#4A313E',
+    '#485E2D',
     '#506C2D',
-    '#506C2D',
-    '#527025',
-    '#528225',
-    '#344793',
-    '#273783',
-    '#0D1763',
-    '#000539',
-    '#000539',
-    '#000539',
+    '#4E7321',
+    '#517A33',
+    '#141E8B',
+    // '#283195',
+    // '#344793',
+    // '#273783',
+    // '#DBE787',
+    // '#222B93',
+    // '#222B93',
+    '#0F1986',
   ]
-  redraw()
-  function redraw() {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
+  const sunset = new THREE.Color(0xFF7433);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 50);
+
+  const renderer = new THREE.WebGLRenderer();
+  let width = window.innerWidth
+  if (width >= 900){
+    width = 800
+  } else {
+    width *= 0.9 
+  }
+  renderer.setSize(width, width);
+  document.body.appendChild(renderer.domElement);
+
+  camera.position.x = 32
+  camera.position.z = 32
+  camera.position.y = 8
+  
+
+
+  camera.lookAt(new THREE.Vector3(16, 0, 16))
+  function setup() {
+
     const terrain = new Terrain()
-    const power = 9
+    const power = 7
     const size = 2 ** power
     terrain.init(size + 1)
-    terrain.set(0, 0,0)
-    terrain.set(0, size, 0)
-    terrain.set(size, size, 0)
-    terrain.set(size, 0, 0)
+    terrain.set(0, 0, -10)
+    terrain.set(0, size, -10)
+    terrain.set(size, size, -10)
+    terrain.set(size, 0, -10)
     terrain.run(size + 1)
-    const squareSize = 1
-    // debugger
-    console.log(terrain.grid.flat().length)
     const allHeights = terrain.grid.flat()
     const max = allHeights.reduce((highest, current) => current > highest ? current : highest)
     const min = allHeights.reduce((lowest, current) => current < lowest ? current : lowest)
-
-    console.log(max, min, max - min)
     terrain.grid.forEach((col, y) => col.forEach((cell, x) => {
       const gradient = cell / max * 256
-      let gradientIndex = Math.floor(terrainPallette.length - cell / max * terrainPallette.length * 1.1)
+      let gradientIndex = Math.floor(terrainPallette.length - cell / max * terrainPallette.length)
       if (gradientIndex < 0) gradientIndex = 0
       if (gradientIndex >= terrainPallette.length) gradientIndex = terrainPallette.length - 1
-
+      // const oldGradientIndex = gradientIndex
+      const height = ((1 - (gradientIndex / terrainPallette.length)) * 8)
+      const geometry = new THREE.BoxGeometry(0.5, height, 0.5)
       const rgb = terrainPallette[gradientIndex]
-      ctx.fillStyle = rgb
-      // ctx.fillStyle = `rgb(${gradient}, ${gradient},${gradient})`
-      ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize)
+      const material = new THREE.MeshBasicMaterial({
+        color: rgb
+      });
+      geometry.translate(x / 4, height / 2, y / 4)
+      geometry.translate(x / 4, 0, y / 4)
+      const column = new THREE.Mesh(geometry, material)
+      scene.add(column);
+      scene.background = sunset
     }))
+
+    document.querySelector('h1').innerText =''
+    renderer.render(scene, camera);
   }
+  setup();
+
+  let frameCount = 0
+  let g = 150
+
+  const animate = function () {
+  
+    if (camera.position.y < 16){
+      frameCount++
+      camera.translateZ(0.05)
+      camera.translateX(-0.02)
+
+      g = 150 - (frameCount / 781) * 75
+      const sunset = new THREE.Color(`rgb(255, ${Math.floor(g)}, 51)`);
+      scene.fog = new THREE.Fog(sunset, 0, 50);
+      scene.background = sunset
+      setTimeout(function () {
+
+        requestAnimationFrame(animate);
+    
+      }, 1000 / 20);
+    } else {
+      document.querySelector('h1').innerText = 'Click here to regenerate'
+    }
+    renderer.render(scene, camera);
+  };
+  animate()
+
+  // redraw()
+  // function redraw() {
+  //   const canvas = document.getElementById('canvas');
+  //   const ctx = canvas.getContext('2d');
+
+  // }
 
 </script>
+
 </html>
