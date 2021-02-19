@@ -1,6 +1,6 @@
 import './App.css';
 import { Canvas } from 'react-three-fiber'
-import Column from './Column';
+import WorldMap from './WorldMap';
            
 function App() {
 
@@ -8,10 +8,10 @@ function App() {
     <div className="App">
      <h1>Please Wait...</h1>
       <Canvas>
-        <Column 
-          baseHeight={4}
-          scaleFactor={1}
-        />
+        <WorldMap 
+          mapLength={7}
+        >
+        </WorldMap>
       </Canvas>
     </div>
   );

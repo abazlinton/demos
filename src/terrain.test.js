@@ -9,7 +9,7 @@ describe('Terrain', () => {
     terrain.getRandomHeight = () => 0
   })
 
-  it('should rejects grids that are wrong size ', () => {
+  it('should rejects grids that are wrong sizes', () => {
     expect(() => new Terrain().init(7)).toThrow('Grid size not valid')
   });
 
@@ -172,7 +172,7 @@ describe('Terrain', () => {
       [4, 0, 4, 4, 4]
     ]
     terrain.run(5)
-    expect(terrain.grid).toStrictEqual(new Array(5).fill(4).map(() => new Array(5).fill(4)))
+    expect(terrain.grid).toStrictEqual(expected)
   });
  
 
