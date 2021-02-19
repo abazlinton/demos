@@ -7,7 +7,6 @@ describe('Terrain', () => {
   beforeEach(() => {
     terrain = new Terrain()
     terrain.getRandomHeight = () => 0
-    debugger
   })
 
   it('should rejects grids that are wrong size ', () => {
