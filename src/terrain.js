@@ -34,10 +34,14 @@ class Terrain {
     corners.push(this.get(x, y, size, 'SW'))
     const average = this.average(corners)
     // if (this.grid[x][y] === 0){
-      let height = average + randomIntFromInterval(0, size * 2) - 0.5 * size * 2
+      let height = average + this.getRandomHeight(size)
       if (height < 0) height = 0
       this.set(x, y, height)
     // }
+  }
+
+  getRandomHeight(size){
+    return randomIntFromInterval(0, size * 2) - 0.5 * size * 2
   }
 
   runDiamond(x, y, size){
@@ -49,7 +53,7 @@ class Terrain {
     const onGridPoints = points.filter(point => point !== undefined)
     const average = this.average(onGridPoints)
     // if (this.grid[x][y] === 0){
-      let height = average + randomIntFromInterval(0, size * 2) - 0.5 * size * 2
+      let height = average + this.getRandomHeight(size)
       if (height < 0) height = 0
       this.set(x, y, height)
     // }
@@ -91,4 +95,4 @@ function randomIntFromInterval(min, max) { // min and max included
 }
 
 
-// module.exports = Terrain
+module.exports = Terrain
