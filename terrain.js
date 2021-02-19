@@ -91,4 +91,4 @@ function randomIntFromInterval(min, max) { // min and max included
 }
 
 
-// module.exports = Terrain
+export default Terrain
