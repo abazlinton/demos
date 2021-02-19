@@ -30,7 +30,6 @@
 </body>
 <script type="module">
 
-
   import * as THREE from 'https://unpkg.com/three/build/three.module.js';
 
   const terrainPallette = [
@@ -45,18 +44,11 @@
     '#4E7321',
     '#517A33',
     '#141E8B',
-    // '#283195',
-    // '#344793',
-    // '#273783',
-    // '#DBE787',
-    // '#222B93',
-    // '#222B93',
     '#0F1986',
   ]
   const sunset = new THREE.Color(0xFF7433);
-
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 50);
+  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
 
   const renderer = new THREE.WebGLRenderer();
   let width = window.innerWidth
@@ -68,14 +60,11 @@
   renderer.setSize(width, width);
   document.body.appendChild(renderer.domElement);
 
-  camera.position.x = 32
-  camera.position.z = 32
-  camera.position.y = 8
-
+  camera.position.x = 64
+  camera.position.z = 64
+  camera.position.y = 12
   const materials = {}
   const boxGeometries = {}
-
-
 
   camera.lookAt(new THREE.Vector3(16, 0, 16))
   function setup() {
@@ -97,14 +86,13 @@
       let gradientIndex = Math.floor(terrainPallette.length - cell / max * terrainPallette.length)
       if (gradientIndex < 0) gradientIndex = 0
       if (gradientIndex >= terrainPallette.length) gradientIndex = terrainPallette.length - 1
-      // const oldGradientIndex = gradientIndex
       const height = ((1 - (gradientIndex / terrainPallette.length)) * 8)
 
       let boxGeometry
       if (boxGeometries[height]) {
         boxGeometry = boxGeometries[height]
       } else {
-        boxGeometry = new THREE.BoxGeometry(0.5, height, 0.5)
+        boxGeometry = new THREE.BoxGeometry(1, height, 1)
         boxGeometries[height] = boxGeometry
       }
 
@@ -119,14 +107,10 @@
         });
         materials[rgb] = material
       }
-      // boxGeometry.translate(x / 4, height / 2, y / 4)
-      // boxGeometry.translate(x / 4, 0, y / 4)
       const column = new THREE.Mesh(boxGeometry, material)
-      column.translateX(x / 4)
-      column.translateX(x / 4)
-      column.translateZ(y / 4)
-      column.translateZ(y / 4)
-      column.translateY(height / 2)
+      column.translateX(x)
+      column.translateZ(y)
+      column.translateY(0.9 * height)
       scene.add(column);
       scene.background = sunset
     }))
@@ -141,20 +125,20 @@
 
   const animate = function () {
 
-    if (camera.position.y < 16) {
+    if (camera.position.y < 28) {
       frameCount++
-      camera.translateZ(0.05)
-      camera.translateX(-0.02)
+      camera.translateZ(0.10)
+      camera.translateX(-0.04)
 
       g = 150 - (frameCount / 781) * 75
       const sunset = new THREE.Color(`rgb(255, ${Math.floor(g)}, 51)`);
-      scene.fog = new THREE.Fog(sunset, 0, 50);
+      scene.fog = new THREE.Fog(sunset, 0, 100);
       scene.background = sunset
       setTimeout(function () {
 
         requestAnimationFrame(animate);
 
-      }, 1000 / 20);
+      }, 1000 / 30);
     } else {
       document.querySelector('h1').innerText = 'Click here to regenerate'
     }
