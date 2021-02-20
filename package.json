@@ -5,9 +5,9 @@
   "main": "index.html",
   "scripts": {
     "test": "jest",
-    "build": "parcel build index.html --out-dir public",
+    "build": "sh ./clean.sh && parcel build index.html --out-dir public",
     "start": "parcel serve index.html",
-    "deploy": "parcel build index.html --out-dir public && vercel public --prod"
+    "deploy": "sh ./clean.sh && parcel build index.html --out-dir public && vercel public --prod"
   },
   "author": "",
   "license": "ISC",
