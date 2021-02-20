@@ -141,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       makeMatrix(matrix, x, height, y)
       // mesh.translateY(height)
-      console.log(height);
       mesh.setMatrixAt(heightTally[gradientIndex].count, matrix)
       scene.add(mesh)
 
