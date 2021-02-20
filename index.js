@@ -45,12 +45,34 @@ document.addEventListener('DOMContentLoaded', () => {
   camera.position.y = 12
   const materials = {}
   const boxGeometries = {}
+  const meshes = {}
 
   camera.lookAt(new THREE.Vector3(16, 0, 16))
   function setup() {
 
+    const makeMatrix = function () {
+
+			const position = new THREE.Vector3();
+			const quaternion = new THREE.Quaternion();
+      const rotation = new THREE.Euler();
+			const scale = new THREE.Vector3();
+      
+
+			return function ( matrix, x, y, z ) {
+
+				position.x = x
+				position.y = y
+				position.z = z
+        scale.x = scale.y = scale.z = 1
+        quaternion.setFromEuler( rotation );
+				matrix.compose( position, quaternion, scale );
+
+			};
+
+		}();
+
     const terrain = new Terrain()
-    const power = 7
+    const power = 6
     const size = 2 ** power
     terrain.init(size + 1)
     terrain.set(0, 0, -10)
@@ -61,19 +83,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const allHeights = terrain.grid.flat()
     const max = allHeights.reduce((highest, current) => current > highest ? current : highest)
     const min = allHeights.reduce((lowest, current) => current < lowest ? current : lowest)
-    terrain.grid.forEach((col, y) => col.forEach((cell, x) => {
+    const matrix = new THREE.Matrix4();
+    
+    function getHeight(gradientIndex){
+      return ((1 - (gradientIndex / terrainPallette.length)) * 8)
+    }
+
+    function getGradientIndex(cell){
       let gradientIndex = Math.floor(terrainPallette.length - cell / max * terrainPallette.length)
       if (gradientIndex < 0) gradientIndex = 0
       if (gradientIndex >= terrainPallette.length) gradientIndex = terrainPallette.length - 1
-      const height = ((1 - (gradientIndex / terrainPallette.length)) * 8)
+      return gradientIndex
+    }
+
+
+    const heightTally = {}
+    terrain.grid.forEach((col) => col.forEach((cell)  => {
+        heightTally[cell] = heightTally[cell] ? heightTally[cell] + 1 : 1
+    }))
+
+    console.log(heightTally)
+
+    terrain.grid.forEach((col, y) => col.forEach((cell, x) => {
+      const gradientIndex = getGradientIndex(cell)
+      const height = getHeight(gradientIndex)
 
       let boxGeometry
-      if (boxGeometries[height]) {
-        boxGeometry = boxGeometries[height]
+      if (boxGeometries[gradientIndex]) {
+        boxGeometry = boxGeometries[gradientIndex]
       } else {
         boxGeometry = new THREE.BoxGeometry(1, height, 1)
         boxGeometries[height] = boxGeometry
       }
+
+      console.log(boxGeometry)
 
       const rgb = terrainPallette[gradientIndex]
 
@@ -86,12 +129,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         materials[rgb] = material
       }
-      const column = new THREE.Mesh(boxGeometry, material)
+      // const column = new THREE.Mesh(boxGeometry, material)
 
-      column.translateX(x)
-      column.translateZ(y)
-      column.translateY(0.9 * height)
-      scene.add(column)
+      let mesh
+      if (meshes[height]) {
+        mesh = meshes[height]
+      } else {
+        mesh =  new THREE.InstancedMesh( boxGeometry, material, heightTally[height] );
+        meshes[rgb] = mesh
+      }
+
+
+      // const numberOfColumns = allHeights.length
+      const columnNumber = (x + y * 4)
+      makeMatrix(matrix, 0, 0, 0)
+      mesh.translateX(x)
+      mesh.translateZ(y)
+      mesh.translateY(height)
+      mesh.setMatrixAt(columnNumber, matrix)
+      scene.add(mesh)
 
 
     }))
