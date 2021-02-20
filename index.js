@@ -2,8 +2,11 @@
   import * as THREE from 'three';
   import Terrain from './terrain'
 
-
   document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelector('.info').addEventListener('click', () => {
+      window.location.reload()
+    })
     const terrainPallette = [
       '#FFFFFF',
       '#9C6608',
@@ -117,13 +120,6 @@
       renderer.render(scene, camera);
     };
     animate()
-  
-    // redraw()
-    // function redraw() {
-    //   const canvas = document.getElementById('canvas');
-    //   const ctx = canvas.getContext('2d');
-  
-    // }
   
   })
 
