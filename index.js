@@ -161,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
     stats.begin()
     if (camera.position.y < 20) {
       frameCount++
-      camera.translateZ(0.10)
-      camera.translateX(-0.04)
+      camera.translateZ(0.05)
+      camera.translateX(-0.02)
 
       g = 150 - (frameCount / 781) * 75
       const sunset = new THREE.Color(`rgb(255, ${Math.floor(g)}, 51)`);
