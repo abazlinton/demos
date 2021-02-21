@@ -34,7 +34,7 @@ class Terrain {
     corners.push(this.get(x, y, size, 'SW'))
     const average = this.average(corners)
     // if (this.grid[x][y] === 0){
-      let height = average + randomIntFromInterval(0, size * 2) - 0.5 * size * 2
+      let height = average + this.getRandomOffsetForHeight(size)
       if (height < 0) height = 0
       this.set(x, y, height)
     // }
@@ -49,7 +49,7 @@ class Terrain {
     const onGridPoints = points.filter(point => point !== undefined)
     const average = this.average(onGridPoints)
     // if (this.grid[x][y] === 0){
-      let height = average + randomIntFromInterval(0, size * 2) - 0.5 * size * 2
+      let height = average + this.getRandomOffsetForHeight(size)
       if (height < 0) height = 0
       this.set(x, y, height)
     // }
@@ -57,6 +57,10 @@ class Terrain {
 
   set(x, y, value){
     this.grid[x][y] = value
+  }
+
+  getRandomOffsetForHeight(size){
+    return randomIntFromInterval(0, size * 2) - 0.5 * size * 2
   }
 
   average(numbers){

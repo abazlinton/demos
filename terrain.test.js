@@ -1,14 +1,20 @@
-const Terrain = require('./terrain')
+import Terrain from './terrain'
 
 
 describe('Terrain', () => {
+
+  let terrain
+
+  beforeEach(() => {
+    terrain = new Terrain()
+    terrain.getRandomOffsetForHeight = () => 0
+  });
 
   it('should rejects grids that are wrong size ', () => {
     expect(() => new Terrain().init(7)).toThrow('Grid size not valid')
   });
 
   it('should be able to retrieve corner values 3x3', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 2],
       [0, 0, 0],
@@ -21,7 +27,6 @@ describe('Terrain', () => {
   })
 
   it('should be able to retrieve corner values 5x5', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 0, 0, 2],
       [0, 0, 0, 0, 0],
@@ -37,7 +42,6 @@ describe('Terrain', () => {
   })
 
   it('should be able to retrieve corner values of 3x3 within a 5x5', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 2, 0, 0],
       [0, 0, 0, 0, 0],
@@ -52,7 +56,6 @@ describe('Terrain', () => {
   })
 
   it('should set square value', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 2],
       [0, 0, 0],
@@ -63,7 +66,6 @@ describe('Terrain', () => {
   });
 
   it('should complete all square values 3x3', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 2],
       [0, 0, 0],
@@ -74,7 +76,6 @@ describe('Terrain', () => {
   });
 
   xit('should complete all square values 5x5', () => {
-    const terrain = new Terrain()
     terrain.init(5)
     terrain.set(0, 0, 4)
     terrain.set(0, 4, 4)
@@ -89,7 +90,6 @@ describe('Terrain', () => {
   });
 
   it('should be able to retrieve diamond values 3x3', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 1],
       [0, 2, 0],
@@ -102,7 +102,6 @@ describe('Terrain', () => {
   })
 
   it('should not blow up reading off-grid', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1]
     ])
@@ -113,7 +112,6 @@ describe('Terrain', () => {
   })
 
   it('should set diamond value 3 points', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 0],
       [0, 2, 0],
@@ -124,7 +122,6 @@ describe('Terrain', () => {
   });
 
   it('should set diamond value 4 points', () => {
-    const terrain = new Terrain()
     terrain.init([
       [0, 2, 0],
       [8, 0, 4],
@@ -135,7 +132,6 @@ describe('Terrain', () => {
   });
 
   it('should set diamond value 3 points 5x5', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 0, 0, 1],
       [0, 0, 0, 0, 0],
@@ -152,7 +148,6 @@ describe('Terrain', () => {
   });
 
   it('should complete ALL 3x3', () => {
-    const terrain = new Terrain()
     terrain.init([
       [1, 0, 1],
       [0, 0, 0],
@@ -163,7 +158,6 @@ describe('Terrain', () => {
   });
 
   it('should complete ALL 5x5', () => {
-    const terrain = new Terrain()
     terrain.init([
       [4, 0, 0, 0, 4],
       [0, 0, 0, 0, 0],

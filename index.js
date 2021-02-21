@@ -2,6 +2,11 @@
 import * as THREE from 'three';
 import Terrain from './terrain'
 import Stats from 'stats.js'
+import {terrainPallette} from './terrainPallette'
+
+export function getHeight(gradientIndex, terrainPallette) {
+  return ((1 - (gradientIndex / terrainPallette.length)) * 8)
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -12,20 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.info').addEventListener('click', () => {
     window.location.reload()
   })
-  const terrainPallette = [
-    '#FFFFFF',
-    '#9C6608',
-    '#885916',
-    '#734C23',
-    '#5F3E31',
-    '#4A313E',
-    '#485E2D',
-    '#506C2D',
-    '#4E7321',
-    '#517A33',
-    '#141E8B',
-    '#0F1986',
-  ]
+
   const sunset = new THREE.Color(0xFF7433);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
@@ -80,11 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const min = allHeights.reduce((lowest, current) => current < lowest ? current : lowest)
     const matrix = new THREE.Matrix4();
 
-    function getHeight(gradientIndex) {
-      return ((1 - (gradientIndex / terrainPallette.length)) * 8)
-    }
+    
 
-    function getGradientIndex(cell) {
+    function getGradientIndex(cell, terrainPallette) {
       let gradientIndex = Math.floor(terrainPallette.length - cell / max * terrainPallette.length)
       if (gradientIndex < 0) gradientIndex = 0
       if (gradientIndex >= terrainPallette.length) gradientIndex = terrainPallette.length - 1
@@ -99,8 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }))
 
     terrain.grid.forEach((col, y) => col.forEach((cell, x) => {
-      const gradientIndex = getGradientIndex(cell)
-      const height = getHeight(gradientIndex)
+      const gradientIndex = getGradientIndex(cell, terrainPallette)
+      const height = getHeight(gradientIndex, terrainPallette)
 
       let boxGeometry
       if (boxGeometries[gradientIndex]) {
