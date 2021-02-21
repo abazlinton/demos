@@ -1,5 +1,7 @@
 class Terrain {
 
+  // TODO: are x, y really the reverse? 1st index is row, so strictly - y
+
   constructor(){
     // [rows, cols]
     this.directionLookup = {
@@ -60,7 +62,7 @@ class Terrain {
   }
 
   getRandomOffsetForHeight(size){
-    return randomIntFromInterval(0, size * 2) - 0.5 * size * 2
+    return randomIntFromInterval(-size, size)
   }
 
   average(numbers){

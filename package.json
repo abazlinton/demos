@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.html",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --watch",
     "build": "sh ./clean.sh && parcel build index.html --out-dir public",
     "start": "parcel serve index.html",
     "deploy": "sh ./clean.sh && parcel build index.html --out-dir public && vercel public --prod"

@@ -5,7 +5,15 @@ import Stats from 'stats.js'
 import {terrainPallette} from './terrainPallette'
 
 export function getHeight(gradientIndex, terrainPallette) {
-  return ((1 - (gradientIndex / terrainPallette.length)) * 8)
+  return ((1 - (gradientIndex / terrainPallette.length)) * 16)
+}
+
+export function getGradientIndex(cellHeight, terrainPallette, heights) {
+  const max = heights.reduce((highest, current) => current > highest ? current : highest)
+  let gradientIndex = Math.floor(terrainPallette.length - cellHeight / max * terrainPallette.length)
+  if (gradientIndex < 0) gradientIndex = 0
+  if (gradientIndex >= terrainPallette.length) gradientIndex = terrainPallette.length - 1
+  return gradientIndex
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -68,28 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
     terrain.set(size, 0, -10)
     terrain.run(size + 1)
     const allHeights = terrain.grid.flat()
-    const max = allHeights.reduce((highest, current) => current > highest ? current : highest)
-    const min = allHeights.reduce((lowest, current) => current < lowest ? current : lowest)
     const matrix = new THREE.Matrix4();
 
-    
-
-    function getGradientIndex(cell, terrainPallette) {
-      let gradientIndex = Math.floor(terrainPallette.length - cell / max * terrainPallette.length)
-      if (gradientIndex < 0) gradientIndex = 0
-      if (gradientIndex >= terrainPallette.length) gradientIndex = terrainPallette.length - 1
-      return gradientIndex
-    }
-
     const heightTally = {}
-    terrain.grid.forEach((col) => col.forEach((cell) => {
-      const gradientIndex = getGradientIndex(cell)
+    terrain.grid.forEach((col) => col.forEach((z) => {
+      const gradientIndex = getGradientIndex(z, terrainPallette, allHeights)
       const currentTotal = heightTally[gradientIndex]?.total
       heightTally[gradientIndex] = currentTotal ? { total: currentTotal + 1 } : { total: 1 }
     }))
 
-    terrain.grid.forEach((col, y) => col.forEach((cell, x) => {
-      const gradientIndex = getGradientIndex(cell, terrainPallette)
+    terrain.grid.forEach((col, z) => col.forEach((y, x) => {
+      const gradientIndex = getGradientIndex(y, terrainPallette, allHeights)
       const height = getHeight(gradientIndex, terrainPallette)
 
       let boxGeometry
@@ -129,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // const numberOfColumns = allHeights.length
       // debugger
 
-      makeMatrix(matrix, x, height, y)
+      makeMatrix(matrix, x, 0, z)
       // mesh.translateY(height)
       mesh.setMatrixAt(heightTally[gradientIndex].count, matrix)
       scene.add(mesh)
