@@ -70,10 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const power = 7
     const size = 2 ** power
     terrain.init(size + 1)
-    terrain.set(0, 0, -10)
-    terrain.set(0, size, -10)
-    terrain.set(size, size, -10)
-    terrain.set(size, 0, -10)
+    terrain.setHeight(0, 0, -10)
+    terrain.setHeight(0, size, -10)
+    terrain.setHeight(size, size, -10)
+    terrain.setHeight(size, 0, -10)
     terrain.run(size + 1)
     const allHeights = terrain.grid.flat()
     const matrix = new THREE.Matrix4();
