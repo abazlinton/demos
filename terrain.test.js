@@ -62,7 +62,7 @@ describe('Terrain', () => {
       [6, 0, 8]
     ])
     terrain.run(3)
-    expect(terrain.grid[1][1]).toBe(5)
+    expect(terrain.getHeight(1, 1)).toBe(5)
   });
 
   it('should be able to retrieve diamond values 3x3', () => {
@@ -94,7 +94,7 @@ describe('Terrain', () => {
       [3, 0, 0]
     ])
     terrain.runDiamond(0, 1, 3)
-    expect(terrain.grid[1][0]).toBe(2)
+    expect(terrain.getHeight(0, 1)).toBe(2)
   });
 
   it('should set diamond value 4 points', () => {
@@ -104,7 +104,7 @@ describe('Terrain', () => {
       [0, 6, 0]
     ])
     terrain.runDiamond(1, 1, 3)
-    expect(terrain.grid[1][1]).toBe(5)
+    expect(terrain.getHeight(1, 1)).toBe(5)
   });
 
   it('should set diamond value 3 points 5x5', () => {
