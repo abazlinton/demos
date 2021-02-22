@@ -16,6 +16,39 @@ export function getGradientIndex(cellHeight, terrainPallette, heights) {
   return gradientIndex
 }
 
+// adapted from https://github.com/mrdoob/three.js/blob/master/examples/webgl_instancing_performance.html
+const makeMatrix = function () {
+  // These are all reused for each column so we just make them once
+  const position = new THREE.Vector3();
+  const quaternion = new THREE.Quaternion();
+  const rotation = new THREE.Euler();
+  const scale = new THREE.Vector3();
+  const matrix = new THREE.Matrix4();
+  return function (x, y, z) {
+    position.x = x
+    position.y = y
+    position.z = z
+    scale.x = scale.y = scale.z = 1
+    quaternion.setFromEuler(rotation);
+    matrix.compose(position, quaternion, scale);
+    return matrix
+  };
+}();
+
+function getTerrain(){
+  const terrain = new Terrain()
+  const power = 7
+  const size = 2 ** power
+  terrain.init(size + 1)
+  terrain.setHeight(0, 0, -10)
+  terrain.setHeight(0, size, -10)
+  terrain.setHeight(size, size, -10)
+  terrain.setHeight(size, 0, -10)
+  terrain.run(size + 1)
+  return terrain
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
   const stats = new Stats();
@@ -26,10 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.reload()
   })
 
-  const sunset = new THREE.Color(0xFF7433);
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
-
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   let width = window.innerWidth
   if (width >= 900) {
@@ -39,133 +68,94 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   renderer.setSize(width, width);
   document.body.appendChild(renderer.domElement);
-
+  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
   camera.position.x = 64
   camera.position.z = 64
   camera.position.y = 12
-  const materials = {}
-  const boxGeometries = {}
-
   camera.lookAt(new THREE.Vector3(16, 0, 16))
-  function setup() {
+  const sunset = new THREE.Color(0xFF7433);
+  const scene = new THREE.Scene();
+  scene.background = sunset
 
-    const makeMatrix = function () {
-
-      const position = new THREE.Vector3();
-      const quaternion = new THREE.Quaternion();
-      const rotation = new THREE.Euler();
-      const scale = new THREE.Vector3();
-      return function (matrix, x, y, z) {
-        position.x = x
-        position.y = y
-        position.z = z
-        scale.x = scale.y = scale.z = 1
-        quaternion.setFromEuler(rotation);
-        matrix.compose(position, quaternion, scale);
-      };
-
-    }();
-
-    const terrain = new Terrain()
-    const power = 7
-    const size = 2 ** power
-    terrain.init(size + 1)
-    terrain.setHeight(0, 0, -10)
-    terrain.setHeight(0, size, -10)
-    terrain.setHeight(size, size, -10)
-    terrain.setHeight(size, 0, -10)
-    terrain.run(size + 1)
+  
+  function setupTerrain() {
+    const terrain = getTerrain()
     const allHeights = terrain.grid.flat()
-    const matrix = new THREE.Matrix4();
 
-    const heightTally = {}
-    terrain.grid.forEach((col) => col.forEach((z) => {
-      const gradientIndex = getGradientIndex(z, terrainPallette, allHeights)
-      const currentTotal = heightTally[gradientIndex]?.total
-      heightTally[gradientIndex] = currentTotal ? { total: currentTotal + 1 } : { total: 1 }
-    }))
+    const meshCache = {}
+    function addInstanceCountToMeshCache() {
+      terrain.grid.forEach((col) => col.forEach((z) => {
+        const gradientIndex = getGradientIndex(z, terrainPallette, allHeights)
+        const currentTotal = meshCache[gradientIndex]?.total
+        meshCache[gradientIndex] = currentTotal ? { total: currentTotal + 1 } : { total: 1 }
+      }))
+    }
+    addInstanceCountToMeshCache()
 
-    terrain.grid.forEach((col, z) => col.forEach((y, x) => {
-      const gradientIndex = getGradientIndex(y, terrainPallette, allHeights)
-      const height = getHeight(gradientIndex, terrainPallette)
-
+    const materialCache = {}
+    const boxGeometryCache = {}
+    // y in 2D terrain becomes z in 3D
+    terrain.grid.forEach((row, z) => row.forEach((rawHeight, x) => {
+      const gradientIndex = getGradientIndex(rawHeight, terrainPallette, allHeights)
+      const finalHeight = getHeight(gradientIndex, terrainPallette)
       let boxGeometry
-      if (boxGeometries[gradientIndex]) {
-        boxGeometry = boxGeometries[gradientIndex]
+      if (boxGeometryCache[gradientIndex]) {
+        boxGeometry = boxGeometryCache[gradientIndex]
       } else {
-        boxGeometry = new THREE.BoxGeometry(1, height, 1)
-        boxGeometries[gradientIndex] = boxGeometry
+        boxGeometry = new THREE.BoxGeometry(1, finalHeight, 1)
+        boxGeometryCache[gradientIndex] = boxGeometry
       }
-
-      // console.log(boxGeometry)
-
       const rgb = terrainPallette[gradientIndex]
-
       let material
-      if (materials[rgb]) {
-        material = materials[rgb]
+      if (materialCache[rgb]) {
+        material = materialCache[rgb]
       } else {
         material = new THREE.MeshBasicMaterial({
           color: rgb
         });
-        materials[rgb] = material
+        materialCache[rgb] = material
       }
-      // const column = new THREE.Mesh(boxGeometry, material)
 
       let mesh
-      if (heightTally[gradientIndex].mesh) {
-        mesh = heightTally[gradientIndex].mesh
-        heightTally[gradientIndex].count++
+      if (meshCache[gradientIndex].mesh) {
+        mesh = meshCache[gradientIndex].mesh
+        meshCache[gradientIndex].count++
       } else {
-        mesh = new THREE.InstancedMesh(boxGeometry, material, heightTally[gradientIndex].total);
-        heightTally[gradientIndex].count = 1
-        heightTally[gradientIndex].mesh = mesh
+        mesh = new THREE.InstancedMesh(boxGeometry, material, meshCache[gradientIndex].total);
+        meshCache[gradientIndex].count = 1
+        meshCache[gradientIndex].mesh = mesh
       }
-      // debugger
-
-      // const numberOfColumns = allHeights.length
-      // debugger
-
-      makeMatrix(matrix, x, 0, z)
-      // mesh.translateY(height)
-      mesh.setMatrixAt(heightTally[gradientIndex].count, matrix)
+     
+      const matrix = makeMatrix(x, 0, z)
+      mesh.setMatrixAt(meshCache[gradientIndex].count, matrix)
       scene.add(mesh)
-
-
     }))
-    scene.background = sunset
-
-
     document.querySelector('h1').innerText = ''
     renderer.render(scene, camera);
   }
-  setup();
+  setupTerrain();
 
   let frameCount = 0
-  let g = 150
+  let green = 150
 
-  const animate = function () {
+  const panCamera = function () {
     stats.begin()
     if (camera.position.y < 20) {
       frameCount++
       camera.translateZ(0.05)
       camera.translateX(-0.02)
-
-      g = 150 - (frameCount / 781) * 75
-      const sunset = new THREE.Color(`rgb(255, ${Math.floor(g)}, 51)`);
+      green = 150 - (frameCount / 781) * 75
+      const sunset = new THREE.Color(`rgb(255, ${Math.floor(green)}, 51)`);
       scene.fog = new THREE.Fog(sunset, 0, 100);
       scene.background = sunset
-      // console.log(renderer.info.render.calls)
-      requestAnimationFrame(animate);
-
+      requestAnimationFrame(panCamera);
     } else {
       document.querySelector('h1').innerText = 'Click here to regenerate'
     }
     renderer.render(scene, camera);
     stats.end()
   };
-  animate()
-
+  panCamera()
 })
 
 

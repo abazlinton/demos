@@ -8,6 +8,8 @@ describe('Terrain', () => {
   beforeEach(() => {
     terrain = new Terrain()
     terrain.getRandomOffsetForHeight = () => 0
+    // +Y ⬇️
+    // +X ➡️
   });
 
   it('should rejects grids that are wrong size ', () => {
@@ -15,6 +17,7 @@ describe('Terrain', () => {
   });
 
   it('should be able to retrieve corner values 3x3', () => {
+    
     terrain.init([
       [4, 0, 3],
       [0, 0, 0],
@@ -99,9 +102,9 @@ describe('Terrain', () => {
 
   it('should set diamond value 4 points', () => {
     terrain.init([
-      [0, 2, 0],
+      [0, 6, 0],
       [8, 0, 4],
-      [0, 6, 0]
+      [0, 2, 0]
     ])
     terrain.runDiamond(1, 1, 3)
     expect(terrain.getHeight(1, 1)).toBe(5)
