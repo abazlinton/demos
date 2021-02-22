@@ -1,4 +1,4 @@
-import { getHeight, getGradientIndex } from './index.js'
+import { getHeight, getGradientIndex } from './terrainMeshes.js'
 
 describe('index functions', () => {
 
