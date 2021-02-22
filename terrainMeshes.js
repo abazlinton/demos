@@ -7,16 +7,16 @@ function getTerrain() {
   const power = 7
   const size = 2 ** power
   terrain.init(size + 1)
-  terrain.setHeight(0, 0, 0)
-  terrain.setHeight(0, size, 0)
-  terrain.setHeight(size, size, 0)
-  terrain.setHeight(size, 0, 0)
+  terrain.setHeight(0, 0, -10)
+  terrain.setHeight(0, size, -10)
+  terrain.setHeight(size, size, -10)
+  terrain.setHeight(size, 0, -10)
   terrain.run(size + 1)
   return terrain
 }
 
 export function getHeight(gradientIndex, terrainPallette) {
-  return ((1 - (gradientIndex / terrainPallette.length)) * 16)
+  return ((1 - (gradientIndex / terrainPallette.length)) * 8)
 }
 
 export function getGradientIndex(cellHeight, terrainPallette, heights) {
@@ -91,8 +91,7 @@ export function getTerrainMeshes() {
       meshCache[gradientIndex].count = 1
       meshCache[gradientIndex].mesh = mesh
     }
-
-    const matrix = makeMatrix(x, 0, z)
+    const matrix = makeMatrix(x, finalHeight, z)
     mesh.setMatrixAt(meshCache[gradientIndex].count, matrix)
   }))
   return meshCache

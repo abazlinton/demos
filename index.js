@@ -18,12 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(renderer.domElement)
   const scene = getScene()
   Object.values(getTerrainMeshes()).forEach(dataForMesh => scene.add(dataForMesh.mesh))
-
+  const wideSea = getWiderSea()
+  scene.add(wideSea);
+  // const axesHelper = new THREE.AxesHelper( 128 );
+  // scene.add( axesHelper );
   const camera = getCamera()
   runFrame(renderer, scene, camera)
 })
 
-function getCamera(){
+function getCamera() {
   const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 100);
   camera.position.x = 64
   camera.position.z = 64
@@ -32,7 +35,7 @@ function getCamera(){
   return camera
 }
 
-function getRenderer(){
+function getRenderer() {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   let width = window.innerWidth
   if (width >= 900) {
@@ -44,7 +47,7 @@ function getRenderer(){
   return renderer
 }
 
-function getScene(){
+function getScene() {
   const sunset = new THREE.Color(0xFF7433);
   const scene = new THREE.Scene();
   scene.background = sunset
@@ -52,11 +55,11 @@ function getScene(){
   return scene
 }
 
-function runFrame(renderer, scene, camera){
+function runFrame(renderer, scene, camera) {
   stats.begin()
   frameCount++
   panCamera(camera)
-  const {sunset, fog} = getSunset(frameCount)
+  const { sunset, fog } = getSunset(frameCount)
   scene.fog = fog
   scene.background = sunset
   renderer.render(scene, camera)
@@ -64,13 +67,13 @@ function runFrame(renderer, scene, camera){
   requestAnimationFrame(() => runFrame(renderer, scene, camera))
 }
 
-const getSunset = function(){
-  let green = 150 
-  return function(frameCount){
+const getSunset = function () {
+  let green = 150
+  return function (frameCount) {
     green = 150 - (frameCount / 781) * 75
     const sunset = new THREE.Color(`rgb(255, ${Math.floor(green)}, 51)`);
     const fog = new THREE.Fog(sunset, 0, 100);
-    return {sunset, fog}
+    return { sunset, fog }
   }
 }()
 
@@ -83,6 +86,17 @@ function panCamera(camera) {
   }
 };
 
- 
+function getWiderSea() {
+  const geometry = new THREE.PlaneGeometry(256, 256);
+  const material = new THREE.MeshBasicMaterial({ color: 0x0F1986, side: THREE.DoubleSide });
+  const plane = new THREE.Mesh(geometry, material);
+  plane.rotation.x = 0.7853981634 * 2
+  plane.position.y = 1.3
+  plane.position.x = 128 - 64
+  plane.position.z = 128 - 64
+  return plane
+}
+
+
 
 

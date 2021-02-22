@@ -7,14 +7,14 @@ describe('index functions', () => {
     const terrainPallette = ["moutain top", "sea"]
     const gradientIndex = 0
     const height = getHeight(gradientIndex, terrainPallette)
-    expect(height).toBe(16)
+    expect(height).toBe(8)
   });
 
   it('calculate lowest height', () => {
     const terrainPallette = ["moutain top", "sea"]
     const gradientIndex = 1
     const height = getHeight(gradientIndex, terrainPallette)
-    expect(height).toBe(8)
+    expect(height).toBe(4)
   });
 
   it('can get correct gradient index', () => {
