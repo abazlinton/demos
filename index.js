@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import Terrain from './terrain'
 import Stats from 'stats.js'
-import {terrainPallette} from './terrainPallette'
+import { terrainPallette } from './terrainPallette'
 
 export function getHeight(gradientIndex, terrainPallette) {
   return ((1 - (gradientIndex / terrainPallette.length)) * 16)
@@ -35,7 +35,7 @@ const makeMatrix = function () {
   };
 }();
 
-function getTerrain(){
+function getTerrain() {
   const terrain = new Terrain()
   const power = 7
   const size = 2 ** power
@@ -77,20 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const scene = new THREE.Scene();
   scene.background = sunset
 
-  
+
   function setupTerrain() {
     const terrain = getTerrain()
     const allHeights = terrain.grid.flat()
 
     const meshCache = {}
-    function addInstanceCountToMeshCache() {
-      terrain.grid.forEach((col) => col.forEach((z) => {
-        const gradientIndex = getGradientIndex(z, terrainPallette, allHeights)
-        const currentTotal = meshCache[gradientIndex]?.total
-        meshCache[gradientIndex] = currentTotal ? { total: currentTotal + 1 } : { total: 1 }
-      }))
-    }
-    addInstanceCountToMeshCache()
+    terrain.grid.forEach((col) => col.forEach((z) => {
+      const gradientIndex = getGradientIndex(z, terrainPallette, allHeights)
+      const currentTotal = meshCache[gradientIndex]?.total
+      meshCache[gradientIndex] = currentTotal ? { total: currentTotal + 1 } : { total: 1 }
+    }))
+
 
     const materialCache = {}
     const boxGeometryCache = {}
@@ -125,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         meshCache[gradientIndex].count = 1
         meshCache[gradientIndex].mesh = mesh
       }
-     
+
       const matrix = makeMatrix(x, 0, z)
       mesh.setMatrixAt(meshCache[gradientIndex].count, matrix)
       scene.add(mesh)
