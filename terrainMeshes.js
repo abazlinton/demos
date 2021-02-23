@@ -1,6 +1,7 @@
 import Terrain from './terrain'
 import { terrainPallette } from './terrainPallette'
 import * as THREE from 'three'
+import {randomIntFromInterval} from './terrain'
 
 function getTerrain() {
   const terrain = new Terrain()
@@ -91,7 +92,8 @@ export function getTerrainMeshes() {
       meshCache[gradientIndex].count = 1
       meshCache[gradientIndex].mesh = mesh
     }
-    const matrix = makeMatrix(x, finalHeight, z)
+    const noise = randomIntFromInterval(0.1, 0.3)
+    const matrix = makeMatrix(x, finalHeight - noise, z)
     mesh.setMatrixAt(meshCache[gradientIndex].count, matrix)
   }))
   return meshCache

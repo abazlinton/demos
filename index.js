@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderer = getRenderer()
   document.body.appendChild(renderer.domElement)
   const scene = getScene()
-  Object.values(getTerrainMeshes()).forEach(dataForMesh => scene.add(dataForMesh.mesh))
+  const terrain = getTerrainMeshes()
+  Object.values(terrain).forEach(dataForMesh => scene.add(dataForMesh.mesh))
   const wideSea = getWiderSea()
   scene.add(wideSea);
   // const axesHelper = new THREE.AxesHelper( 128 );
@@ -54,7 +55,7 @@ function getScene() {
   document.querySelector('h1').innerText = ''
   return scene
 }
-
+// TODO: stop rendering at some point!
 function runFrame(renderer, scene, camera) {
   stats.begin()
   frameCount++

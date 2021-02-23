@@ -89,7 +89,8 @@ class Terrain {
   }
 }
 
-function randomIntFromInterval(min, max) { // min and max included 
+// TODO - this aint an int!
+export function randomIntFromInterval(min, max) { // min and max included 
   return Math.random() * (max - min + 1) + min;
 }
 
